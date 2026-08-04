@@ -64,6 +64,8 @@
   }
   @media (max-width: 860px){
     .shell{ grid-template-columns: 1fr; }
+    .sidebar{ order: 2; }
+    .page{ order: 1; }
   }
 
   /* ===== SIDEBAR ===== */
@@ -80,7 +82,7 @@
     gap: 22px;
   }
   @media (max-width: 860px){
-    .sidebar{ position: static; height: auto; border-right: none; border-bottom: 1px solid var(--hair-line); }
+    .sidebar{ position: static; height: auto; border-right: none; border-top: 1px solid var(--hair-line); border-bottom: none; }
   }
 
   .brand-mark{
@@ -184,21 +186,17 @@
     background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
     margin-bottom: 28px;
   }
-  .tb-eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin: 0 0 10px;
-  }
   .tb-title{
     font-family:'Space Grotesk', sans-serif;
     font-weight: 700;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(1.5rem, 6.2vw, 3rem);
     letter-spacing: -0.5px;
     margin: 0 0 8px;
     color: var(--paper);
+    white-space: nowrap;
+  }
+  @media (max-width: 380px){
+    .tb-title{ letter-spacing: -0.8px; }
   }
   .tb-sub{
     font-size: 0.95rem;
@@ -232,7 +230,18 @@
     .bench{ grid-template-columns: 1fr; }
   }
 
-  /* ===== CATEGORY RAIL ===== */
+  /* ===== CATEGORY RAIL — per-category accent colors ===== */
+  .rail-btn[data-tab="length"]  { --accent:#4d96ff; }
+  .rail-btn[data-tab="weight"]  { --accent:#6bcb77; }
+  .rail-btn[data-tab="temp"]    { --accent:#ff6b6b; }
+  .rail-btn[data-tab="area"]    { --accent:#ffd93d; }
+  .rail-btn[data-tab="volume"]  { --accent:#c77dff; }
+  .rail-btn[data-tab="speed"]   { --accent:#ff9a3c; }
+  .rail-btn[data-tab="time"]    { --accent:#00d4aa; }
+  .rail-btn[data-tab="data"]    { --accent:#ff6fd8; }
+  .rail-btn[data-tab="energy"]  { --accent:#f2c14e; }
+  .rail-btn[data-tab="pressure"]{ --accent:#7cffb2; }
+
   .rail{
     border: 1px solid var(--hair-line);
     border-radius: var(--radius);
@@ -252,7 +261,16 @@
     flex-direction: column;
   }
   @media (max-width: 760px){
-    .rail-list{ flex-direction: row; overflow-x: auto; gap: 2px; padding: 0 6px 10px; }
+    .rail{ overflow: visible; }
+    .rail-list{
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 4px 10px 12px;
+    }
+  }
+  @media (max-width: 380px){
+    .rail-list{ grid-template-columns: 1fr 1fr; gap: 6px; }
   }
   .rail-btn{
     display: flex;
@@ -270,22 +288,36 @@
     cursor: pointer;
     white-space: nowrap;
   }
+  @media (max-width: 760px){
+    .rail-btn{
+      border: 1px solid var(--hair-line);
+      border-left: 1px solid var(--hair-line);
+      border-radius: 10px;
+      padding: 10px 10px;
+      white-space: normal;
+      background: rgba(255,255,255,0.02);
+    }
+  }
   .rail-btn .code{
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.66rem;
-    color: var(--amber-dim);
+    color: var(--accent, var(--amber-dim));
     border: 1px solid var(--hair-line);
     border-radius: 4px;
     padding: 1px 5px;
     letter-spacing: 0.5px;
+    flex: none;
   }
   .rail-btn:hover{ color: var(--paper); background: rgba(255,255,255,0.03); }
   .rail-btn.active{
     color: var(--paper);
-    border-left-color: var(--amber);
+    border-left-color: var(--accent, var(--amber));
     background: rgba(242,169,59,0.08);
   }
-  .rail-btn.active .code{ color: var(--amber); border-color: var(--amber-dim); }
+  @media (max-width: 760px){
+    .rail-btn.active{ border-color: var(--accent, var(--amber)); background: rgba(255,255,255,0.05); }
+  }
+  .rail-btn.active .code{ color: var(--accent, var(--amber)); border-color: var(--accent, var(--amber-dim)); }
 
   /* ===== INSTRUMENT PANEL ===== */
   .panel{
@@ -310,6 +342,16 @@
     font-size: 1.3rem;
     font-weight: 700;
   }
+  #length .panel-title{ color:#4d96ff; }
+  #weight .panel-title{ color:#6bcb77; }
+  #temp .panel-title{ color:#ff6b6b; }
+  #area .panel-title{ color:#ffd93d; }
+  #volume .panel-title{ color:#c77dff; }
+  #speed .panel-title{ color:#ff9a3c; }
+  #time .panel-title{ color:#00d4aa; }
+  #data .panel-title{ color:#ff6fd8; }
+  #energy .panel-title{ color:#f2c14e; }
+  #pressure .panel-title{ color:#7cffb2; }
   .panel-units{
     font-family:'IBM Plex Mono', monospace;
     font-size: 0.68rem;
@@ -435,6 +477,8 @@
     line-height: 1.75;
     color: var(--paper-dim);
     max-width: 760px;
+    text-align: justify;
+    text-justify: inter-word;
   }
   .notes p b{ color: var(--paper); font-weight: 600; }
 
@@ -498,7 +542,6 @@
 
   <!-- TITLE BLOCK -->
   <header class="titleblock">
-    <p class="tb-eyebrow">Field Reference — Instrument 001</p>
     <h1 class="tb-title">Unit Converter Tool</h1>
     <p class="tb-sub">A precision unit converter built like a bench tool: pick a measurement, dial in the reading, and read the result straight off the display. No accounts, no server round-trip — every calculation happens on your machine.</p>
     <div class="tb-meta">
@@ -659,7 +702,7 @@
 
       <!-- NOTES -->
       <div class="notes">
-        <p><b>What this is.</b> Conversion Bench covers ten measurement types — length, weight, temperature, area, volume, speed, time, data storage, energy and pressure — with more than 200 unit pairs between them. Pick a measurement from the rail, dial in a reading, and the display updates as you type.</p>
+        <p><b>What this is.</b> Unit Converter Tool covers ten measurement types — length, weight, temperature, area, volume, speed, time, data storage, energy and pressure — with more than 200 unit pairs between them. Pick a measurement from the list, dial in a reading, and the display updates as you type.</p>
         <p><b>How it works.</b> Every calculation runs as JavaScript in your browser tab. Nothing is sent to a server, nothing is logged, and it keeps working with no connection once the page has loaded. Results are shown to eight significant digits, and very large or very small values switch to scientific notation automatically.</p>
       </div>
     </div>
