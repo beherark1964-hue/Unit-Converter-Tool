@@ -204,6 +204,8 @@
     max-width: 620px;
     line-height: 1.6;
     margin: 0 0 18px;
+    text-align: justify;
+    text-justify: inter-word;
   }
   .tb-meta{
     display:flex;
@@ -354,10 +356,24 @@
   #pressure .panel-title{ color:#7cffb2; }
   .panel-units{
     font-family:'IBM Plex Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--paper-dim);
+    font-size: 0.7rem;
+    font-weight: 700;
     text-align: right;
+    letter-spacing: 0.2px;
   }
+  .panel-units span:not(:last-child)::after{
+    content: " · ";
+    color: var(--paper-dim);
+    font-weight: 400;
+  }
+  .panel-units span:nth-child(8n+1){ color:#4d96ff; }
+  .panel-units span:nth-child(8n+2){ color:#6bcb77; }
+  .panel-units span:nth-child(8n+3){ color:#ff6b6b; }
+  .panel-units span:nth-child(8n+4){ color:#ffd93d; }
+  .panel-units span:nth-child(8n+5){ color:#c77dff; }
+  .panel-units span:nth-child(8n+6){ color:#ff9a3c; }
+  .panel-units span:nth-child(8n+7){ color:#00d4aa; }
+  .panel-units span:nth-child(8n){ color:#ff6fd8; }
 
   .row{
     display: grid;
@@ -465,6 +481,20 @@
   }
   .share-btn:hover{ border-color: var(--amber); color: var(--amber); }
   .share-btn svg{ width:13px; height:13px; fill:currentColor; }
+
+  /* Distinct brand colors per platform */
+  .sb-fb{ color:#4d96ff; border-color: rgba(77,150,255,0.35); }
+  .sb-fb:hover{ background: rgba(77,150,255,0.12); border-color:#4d96ff; color:#4d96ff; }
+  .sb-x{ color:#e8ecf4; border-color: rgba(232,236,244,0.3); }
+  .sb-x:hover{ background: rgba(232,236,244,0.1); border-color:#e8ecf4; color:#e8ecf4; }
+  .sb-linkedin{ color:#5fb0ff; border-color: rgba(95,176,255,0.35); }
+  .sb-linkedin:hover{ background: rgba(95,176,255,0.12); border-color:#5fb0ff; color:#5fb0ff; }
+  .sb-whatsapp{ color:#4fd67a; border-color: rgba(79,214,122,0.35); }
+  .sb-whatsapp:hover{ background: rgba(79,214,122,0.12); border-color:#4fd67a; color:#4fd67a; }
+  .sb-pinterest{ color:#ff6b6b; border-color: rgba(255,107,107,0.35); }
+  .sb-pinterest:hover{ background: rgba(255,107,107,0.12); border-color:#ff6b6b; color:#ff6b6b; }
+  .sb-copy{ color:#f2c14e; border-color: rgba(242,193,78,0.35); }
+  .sb-copy:hover{ background: rgba(242,193,78,0.12); border-color:#f2c14e; color:#f2c14e; }
 
   /* ===== NOTES / DESCRIPTION ===== */
   .notes{
@@ -574,7 +604,7 @@
     <div>
       <!-- LENGTH -->
       <div class="panel active" id="length">
-        <div class="panel-head"><div class="panel-title">Length</div><div class="panel-units">m · km · mi · ft · in · yd · cm · mm · nm</div></div>
+        <div class="panel-head"><div class="panel-title">Length</div><div class="panel-units"><span>m</span><span>km</span><span>mi</span><span>ft</span><span>in</span><span>yd</span><span>cm</span><span>mm</span><span>nm</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="length-val" oninput="ucConvert('length')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="length-from" onchange="ucConvert('length')"><option value="m">Meter (m)</option><option value="km">Kilometer (km)</option><option value="cm">Centimeter (cm)</option><option value="mm">Millimeter (mm)</option><option value="mi">Mile (mi)</option><option value="yd">Yard (yd)</option><option value="ft">Foot (ft)</option><option value="in">Inch (in)</option><option value="nm">Nanometer (nm)</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('length')">⇄</button><div class="tick"></div></div>
@@ -584,7 +614,7 @@
 
       <!-- WEIGHT -->
       <div class="panel" id="weight">
-        <div class="panel-head"><div class="panel-title">Weight / Mass</div><div class="panel-units">kg · g · mg · lb · oz · t · st</div></div>
+        <div class="panel-head"><div class="panel-title">Weight / Mass</div><div class="panel-units"><span>kg</span><span>g</span><span>mg</span><span>lb</span><span>oz</span><span>t</span><span>st</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="weight-val" oninput="ucConvert('weight')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="weight-from" onchange="ucConvert('weight')"><option value="kg">Kilogram (kg)</option><option value="g">Gram (g)</option><option value="mg">Milligram (mg)</option><option value="lb">Pound (lb)</option><option value="oz">Ounce (oz)</option><option value="t">Metric Ton (t)</option><option value="st">Stone (st)</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('weight')">⇄</button><div class="tick"></div></div>
@@ -594,7 +624,7 @@
 
       <!-- TEMPERATURE -->
       <div class="panel" id="temp">
-        <div class="panel-head"><div class="panel-title">Temperature</div><div class="panel-units">Celsius · Fahrenheit · Kelvin</div></div>
+        <div class="panel-head"><div class="panel-title">Temperature</div><div class="panel-units"><span>Celsius</span><span>Fahrenheit</span><span>Kelvin</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="temp-val" oninput="ucConvert('temp')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="temp-from" onchange="ucConvert('temp')"><option value="c">Celsius (C)</option><option value="f">Fahrenheit (F)</option><option value="k">Kelvin (K)</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('temp')">⇄</button><div class="tick"></div></div>
@@ -604,7 +634,7 @@
 
       <!-- AREA -->
       <div class="panel" id="area">
-        <div class="panel-head"><div class="panel-title">Area</div><div class="panel-units">m² · km² · ft² · in² · acre · hectare</div></div>
+        <div class="panel-head"><div class="panel-title">Area</div><div class="panel-units"><span>m²</span><span>km²</span><span>ft²</span><span>in²</span><span>acre</span><span>hectare</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="area-val" oninput="ucConvert('area')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="area-from" onchange="ucConvert('area')"><option value="m2">Square Meter (m²)</option><option value="km2">Square Kilometer (km²)</option><option value="cm2">Square Centimeter (cm²)</option><option value="ft2">Square Foot (ft²)</option><option value="in2">Square Inch (in²)</option><option value="ac">Acre</option><option value="ha">Hectare</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('area')">⇄</button><div class="tick"></div></div>
@@ -614,7 +644,7 @@
 
       <!-- VOLUME -->
       <div class="panel" id="volume">
-        <div class="panel-head"><div class="panel-title">Volume</div><div class="panel-units">L · mL · gal · qt · pt · cup · fl oz</div></div>
+        <div class="panel-head"><div class="panel-title">Volume</div><div class="panel-units"><span>L</span><span>mL</span><span>gal</span><span>qt</span><span>pt</span><span>cup</span><span>fl oz</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="volume-val" oninput="ucConvert('volume')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="volume-from" onchange="ucConvert('volume')"><option value="l">Liter (L)</option><option value="ml">Milliliter (mL)</option><option value="m3">Cubic Meter (m³)</option><option value="gal">Gallon (US)</option><option value="qt">Quart (US)</option><option value="pt">Pint (US)</option><option value="cup">Cup (US)</option><option value="floz">Fl. Ounce (US)</option><option value="tbsp">Tablespoon</option><option value="tsp">Teaspoon</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('volume')">⇄</button><div class="tick"></div></div>
@@ -624,7 +654,7 @@
 
       <!-- SPEED -->
       <div class="panel" id="speed">
-        <div class="panel-head"><div class="panel-title">Speed</div><div class="panel-units">km/h · m/s · mph · knot · mach</div></div>
+        <div class="panel-head"><div class="panel-title">Speed</div><div class="panel-units"><span>km/h</span><span>m/s</span><span>mph</span><span>knot</span><span>mach</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="speed-val" oninput="ucConvert('speed')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="speed-from" onchange="ucConvert('speed')"><option value="kmh">km/h</option><option value="ms">m/s</option><option value="mph">mph</option><option value="kn">Knot</option><option value="mach">Mach</option><option value="fts">ft/s</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('speed')">⇄</button><div class="tick"></div></div>
@@ -634,7 +664,7 @@
 
       <!-- TIME -->
       <div class="panel" id="time">
-        <div class="panel-head"><div class="panel-title">Time</div><div class="panel-units">s · min · h · day · week · month · year</div></div>
+        <div class="panel-head"><div class="panel-title">Time</div><div class="panel-units"><span>s</span><span>min</span><span>h</span><span>day</span><span>week</span><span>month</span><span>year</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="time-val" oninput="ucConvert('time')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="time-from" onchange="ucConvert('time')"><option value="s">Second</option><option value="ms">Millisecond</option><option value="min">Minute</option><option value="h">Hour</option><option value="d">Day</option><option value="wk">Week</option><option value="mo">Month (avg)</option><option value="yr">Year</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('time')">⇄</button><div class="tick"></div></div>
@@ -644,7 +674,7 @@
 
       <!-- DATA -->
       <div class="panel" id="data">
-        <div class="panel-head"><div class="panel-title">Data Storage</div><div class="panel-units">bit · byte · KB · MB · GB · TB · PB</div></div>
+        <div class="panel-head"><div class="panel-title">Data Storage</div><div class="panel-units"><span>bit</span><span>byte</span><span>KB</span><span>MB</span><span>GB</span><span>TB</span><span>PB</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="data-val" oninput="ucConvert('data')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="data-from" onchange="ucConvert('data')"><option value="b">Bit</option><option value="B">Byte</option><option value="KB">Kilobyte (KB)</option><option value="MB">Megabyte (MB)</option><option value="GB">Gigabyte (GB)</option><option value="TB">Terabyte (TB)</option><option value="PB">Petabyte (PB)</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('data')">⇄</button><div class="tick"></div></div>
@@ -654,7 +684,7 @@
 
       <!-- ENERGY -->
       <div class="panel" id="energy">
-        <div class="panel-head"><div class="panel-title">Energy</div><div class="panel-units">J · kJ · cal · kcal · kWh · BTU · erg</div></div>
+        <div class="panel-head"><div class="panel-title">Energy</div><div class="panel-units"><span>J</span><span>kJ</span><span>cal</span><span>kcal</span><span>kWh</span><span>BTU</span><span>erg</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="energy-val" oninput="ucConvert('energy')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="energy-from" onchange="ucConvert('energy')"><option value="j">Joule (J)</option><option value="kj">Kilojoule (kJ)</option><option value="cal">Calorie (cal)</option><option value="kcal">Kilocalorie (kcal)</option><option value="kwh">Kilowatt-hour (kWh)</option><option value="btu">BTU</option><option value="erg">Erg</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('energy')">⇄</button><div class="tick"></div></div>
@@ -664,7 +694,7 @@
 
       <!-- PRESSURE -->
       <div class="panel" id="pressure">
-        <div class="panel-head"><div class="panel-title">Pressure</div><div class="panel-units">Pa · kPa · bar · psi · atm · torr</div></div>
+        <div class="panel-head"><div class="panel-title">Pressure</div><div class="panel-units"><span>Pa</span><span>kPa</span><span>bar</span><span>psi</span><span>atm</span><span>torr</span></div></div>
         <div class="row"><div class="field"><label>Reading</label><input id="pressure-val" oninput="ucConvert('pressure')" placeholder="0" type="number" /></div>
         <div class="field"><label>From unit</label><select id="pressure-from" onchange="ucConvert('pressure')"><option value="pa">Pascal (Pa)</option><option value="kpa">Kilopascal (kPa)</option><option value="bar">Bar</option><option value="psi">PSI</option><option value="atm">Atmosphere (atm)</option><option value="torr">Torr (mmHg)</option></select></div></div>
         <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('pressure')">⇄</button><div class="tick"></div></div>
@@ -674,27 +704,27 @@
 
       <!-- SHARE -->
       <div class="share">
-        <a class="share-btn" href="#" onclick="ucShareOn('fb', event)" target="_blank">
+        <a class="share-btn sb-fb" href="#" onclick="ucShareOn('fb', event)" target="_blank">
           <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           Facebook
         </a>
-        <a class="share-btn" href="#" onclick="ucShareOn('x', event)" target="_blank">
+        <a class="share-btn sb-x" href="#" onclick="ucShareOn('x', event)" target="_blank">
           <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           X
         </a>
-        <a class="share-btn" href="#" onclick="ucShareOn('linkedin', event)" target="_blank">
+        <a class="share-btn sb-linkedin" href="#" onclick="ucShareOn('linkedin', event)" target="_blank">
           <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
         </a>
-        <a class="share-btn" href="#" onclick="ucShareOn('whatsapp', event)" target="_blank">
+        <a class="share-btn sb-whatsapp" href="#" onclick="ucShareOn('whatsapp', event)" target="_blank">
           <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.238c0-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.438 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.86 11.86 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
           WhatsApp
         </a>
-        <a class="share-btn" href="#" onclick="ucShareOn('pinterest', event)" target="_blank">
+        <a class="share-btn sb-pinterest" href="#" onclick="ucShareOn('pinterest', event)" target="_blank">
           <svg viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.283 1.194.6 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.222-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.62 0 11.988-5.368 11.988-11.987C23.997 5.367 18.628 0 12.017 0"/></svg>
           Pinterest
         </a>
-        <button class="share-btn" onclick="ucCopyPageUrl()">
+        <button class="share-btn sb-copy" onclick="ucCopyPageUrl()">
           <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
           Copy link
         </button>
