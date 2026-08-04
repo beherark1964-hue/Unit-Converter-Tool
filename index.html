@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unit Converter Tool — From the House of Internet AI Tools</title>
+<meta name="description" content="A precision, instrument-style unit converter covering length, weight, temperature, area, volume, speed, time, data, energy and pressure. Runs entirely in your browser. From the house of Internet AI Tools." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blueprint:#0b2c4d;
+    --blueprint-panel:#123a61;
+    --blueprint-panel-2:#0e3357;
+    --grid-line: rgba(237,239,245,0.055);
+    --hair-line: rgba(237,239,245,0.16);
+    --paper:#edeff5;
+    --paper-dim:#a9bad4;
+    --amber:#f2a93b;
+    --amber-dim:#c98a2d;
+    --lcd:#ffb020;
+    --lcd-dim: rgba(255,176,32,0.18);
+    --coral:#ff6b5e;
+    --radius:14px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background-color: var(--blueprint);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid-line) 0, var(--grid-line) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0, var(--grid-line) 1px, transparent 1px, transparent 32px);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Corner registration marks — drafting-table detail */
+  .crop{
+    position: fixed;
+    width: 22px; height: 22px;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.5;
+  }
+  .crop::before, .crop::after{ content:""; position:absolute; background: var(--paper-dim); }
+  .crop::before{ width:100%; height:1px; top:50%; left:0; }
+  .crop::after{ width:1px; height:100%; left:50%; top:0; }
+  .crop.tl{ top:14px; left:14px; }
+  .crop.tr{ top:14px; right:14px; }
+  .crop.bl{ bottom:14px; left:14px; }
+  .crop.br{ bottom:14px; right:14px; }
+
+  /* ===== SHELL: sidebar + main, edge-to-edge (no outer left/right gutters) ===== */
+  .shell{
+    display: grid;
+    grid-template-columns: 272px 1fr;
+    align-items: start;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+  @media (max-width: 860px){
+    .shell{ grid-template-columns: 1fr; }
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--hair-line);
+    background: rgba(0,0,0,0.14);
+    padding: 26px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  @media (max-width: 860px){
+    .sidebar{ position: static; height: auto; border-right: none; border-bottom: 1px solid var(--hair-line); }
+  }
+
+  .brand-mark{
+    display:flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .brand-mark .b-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.2px;
+    color: var(--paper);
+    line-height: 1.25;
+  }
+  .brand-mark .b-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+
+  .announce{
+    border: 1px solid var(--hair-line);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(242,169,59,0.07), rgba(242,169,59,0.015));
+    padding: 16px 16px 18px;
+  }
+  .announce-head{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .announce-dot{
+    width: 7px; height:7px; border-radius:50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    flex: none;
+  }
+  .announce-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+  .announce p{
+    font-size: 0.78rem;
+    color: var(--paper-dim);
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+  .announce ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .announce li{
+    display:flex;
+    align-items:flex-start;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--paper);
+  }
+  .announce li::before{
+    content:"→";
+    color: var(--amber-dim);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .sidebar-foot{
+    margin-top: auto;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--paper-dim);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  /* ===== MAIN COLUMN ===== */
+  .page{
+    padding: 40px 28px 40px;
+    min-width: 0;
+  }
+  @media (max-width: 560px){
+    .page{ padding: 28px 16px 32px; }
+  }
+
+  /* ===== TITLE BLOCK HEADER ===== */
+  .titleblock{
+    border: 1px solid var(--hair-line);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    margin-bottom: 28px;
+  }
+  .tb-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 10px;
+  }
+  .tb-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.5px;
+    margin: 0 0 8px;
+    color: var(--paper);
+  }
+  .tb-sub{
+    font-size: 0.95rem;
+    color: var(--paper-dim);
+    max-width: 620px;
+    line-height: 1.6;
+    margin: 0 0 18px;
+  }
+  .tb-meta{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--paper-dim);
+    border-top: 1px dashed var(--hair-line);
+    padding-top: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .tb-meta b{ color: var(--amber); font-weight: 600; }
+
+  /* ===== LAYOUT ===== */
+  .bench{
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 760px){
+    .bench{ grid-template-columns: 1fr; }
+  }
+
+  /* ===== CATEGORY RAIL ===== */
+  .rail{
+    border: 1px solid var(--hair-line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: rgba(255,255,255,0.015);
+  }
+  .rail-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    padding: 12px 14px 8px;
+  }
+  .rail-list{
+    display:flex;
+    flex-direction: column;
+  }
+  @media (max-width: 760px){
+    .rail-list{ flex-direction: row; overflow-x: auto; gap: 2px; padding: 0 6px 10px; }
+  }
+  .rail-btn{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    padding: 11px 14px;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    color: var(--paper-dim);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .rail-btn .code{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--amber-dim);
+    border: 1px solid var(--hair-line);
+    border-radius: 4px;
+    padding: 1px 5px;
+    letter-spacing: 0.5px;
+  }
+  .rail-btn:hover{ color: var(--paper); background: rgba(255,255,255,0.03); }
+  .rail-btn.active{
+    color: var(--paper);
+    border-left-color: var(--amber);
+    background: rgba(242,169,59,0.08);
+  }
+  .rail-btn.active .code{ color: var(--amber); border-color: var(--amber-dim); }
+
+  /* ===== INSTRUMENT PANEL ===== */
+  .panel{
+    display: none;
+    border: 1px solid var(--hair-line);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+    padding: 26px;
+  }
+  .panel.active{ display:block; }
+
+  .panel-head{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dashed var(--hair-line);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+  .panel-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .panel-units{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--paper-dim);
+    text-align: right;
+  }
+
+  .row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 480px){ .row{ grid-template-columns: 1fr; } }
+
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    margin-bottom: 6px;
+  }
+  .field input, .field select{
+    width:100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--hair-line);
+    border-radius: 8px;
+    padding: 11px 12px;
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    outline: none;
+  }
+  .field input:focus, .field select:focus{ border-color: var(--amber); }
+  .field select option{ background: var(--blueprint-panel); color: var(--paper); }
+
+  .swap-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    margin: 6px 0 16px;
+  }
+  .swap-row .tick{ flex:1; height:1px; background: repeating-linear-gradient(90deg, var(--hair-line) 0 4px, transparent 4px 8px); }
+  .swap-btn{
+    width: 36px; height:36px;
+    border-radius: 8px;
+    border: 1px solid var(--hair-line);
+    background: rgba(0,0,0,0.2);
+    color: var(--amber);
+    font-size: 1rem;
+    cursor:pointer;
+  }
+  .swap-btn:hover{ border-color: var(--amber); background: rgba(242,169,59,0.1); }
+
+  .readout{
+    margin-top: 6px;
+    border: 1px solid var(--hair-line);
+    border-radius: 10px;
+    background: #071b30;
+    padding: 16px 18px;
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .readout-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+  }
+  .readout-value{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 1.9rem;
+    color: var(--lcd);
+    text-shadow: 0 0 14px var(--lcd-dim);
+    word-break: break-word;
+  }
+  .readout-unit{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--paper-dim);
+  }
+
+  /* ===== SHARE ROW ===== */
+  .share{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 6px;
+  }
+  .share-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding: 7px 13px;
+    border-radius: 7px;
+    border: 1px solid var(--hair-line);
+    background: rgba(255,255,255,0.02);
+    color: var(--paper-dim);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    cursor:pointer;
+  }
+  .share-btn:hover{ border-color: var(--amber); color: var(--amber); }
+  .share-btn svg{ width:13px; height:13px; fill:currentColor; }
+
+  /* ===== NOTES / DESCRIPTION ===== */
+  .notes{
+    margin-top: 30px;
+    border-top: 1px dashed var(--hair-line);
+    padding-top: 22px;
+  }
+  .notes p{
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--paper-dim);
+    max-width: 760px;
+  }
+  .notes p b{ color: var(--paper); font-weight: 600; }
+
+  /* ===== FOOTER TITLE BLOCK ===== */
+  .footblock{
+    margin-top: 34px;
+    border: 1px solid var(--hair-line);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--paper-dim);
+  }
+  .footblock a{ color: var(--amber); text-decoration:none; }
+  .footblock a:hover{ text-decoration: underline; }
+  .footblock .brand{ color: var(--paper); font-weight:600; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="crop tl"></div>
+<div class="crop tr"></div>
+<div class="crop bl"></div>
+<div class="crop br"></div>
+
+<div class="shell">
+
+  <!-- SIDEBAR: brand + announcements -->
+  <aside class="sidebar">
+    <div class="brand-mark">
+      <div class="b-name">Unit Converter Tool</div>
+      <div class="b-tag">From the House of Internet AI Tools</div>
+    </div>
+
+    <div class="announce">
+      <div class="announce-head">
+        <span class="announce-dot"></span>
+        <span class="announce-title">Coming Soon</span>
+      </div>
+      <p>New free browser tools we're building next — no signup, no ads, runs entirely on your device.</p>
+      <ul>
+        <li>Barcode Generator</li>
+        <li>QR Code Generator</li>
+        <li>Mortgage Calculator</li>
+        <li>World Clock</li>
+        <li>Stopwatch</li>
+        <li>...and many more</li>
+      </ul>
+    </div>
+
+    <div class="sidebar-foot">All tools run locally in your browser.<br/>Nothing you enter is ever sent to a server.</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="page">
+
+  <!-- TITLE BLOCK -->
+  <header class="titleblock">
+    <p class="tb-eyebrow">Field Reference — Instrument 001</p>
+    <h1 class="tb-title">Unit Converter Tool</h1>
+    <p class="tb-sub">A precision unit converter built like a bench tool: pick a measurement, dial in the reading, and read the result straight off the display. No accounts, no server round-trip — every calculation happens on your machine.</p>
+    <div class="tb-meta">
+      <span><b>10</b> measurement types</span>
+      <span><b>200+</b> unit pairs</span>
+      <span><b>0</b> data leaves your browser</span>
+      <span>Precision: <b>8 significant digits</b></span>
+    </div>
+  </header>
+
+  <div class="bench">
+    <!-- CATEGORY RAIL -->
+    <nav class="rail" id="uc-tabs">
+      <div class="rail-label">Measurement</div>
+      <div class="rail-list">
+        <button class="rail-btn active" data-tab="length"><span class="code">LEN</span> Length</button>
+        <button class="rail-btn" data-tab="weight"><span class="code">WT</span> Weight</button>
+        <button class="rail-btn" data-tab="temp"><span class="code">TMP</span> Temperature</button>
+        <button class="rail-btn" data-tab="area"><span class="code">ARE</span> Area</button>
+        <button class="rail-btn" data-tab="volume"><span class="code">VOL</span> Volume</button>
+        <button class="rail-btn" data-tab="speed"><span class="code">SPD</span> Speed</button>
+        <button class="rail-btn" data-tab="time"><span class="code">TME</span> Time</button>
+        <button class="rail-btn" data-tab="data"><span class="code">DAT</span> Data</button>
+        <button class="rail-btn" data-tab="energy"><span class="code">NRG</span> Energy</button>
+        <button class="rail-btn" data-tab="pressure"><span class="code">PRS</span> Pressure</button>
+      </div>
+    </nav>
+
+    <!-- PANELS -->
+    <div>
+      <!-- LENGTH -->
+      <div class="panel active" id="length">
+        <div class="panel-head"><div class="panel-title">Length</div><div class="panel-units">m · km · mi · ft · in · yd · cm · mm · nm</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="length-val" oninput="ucConvert('length')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="length-from" onchange="ucConvert('length')"><option value="m">Meter (m)</option><option value="km">Kilometer (km)</option><option value="cm">Centimeter (cm)</option><option value="mm">Millimeter (mm)</option><option value="mi">Mile (mi)</option><option value="yd">Yard (yd)</option><option value="ft">Foot (ft)</option><option value="in">Inch (in)</option><option value="nm">Nanometer (nm)</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('length')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="length-to" onchange="ucConvert('length')"><option value="km">Kilometer (km)</option><option value="m">Meter (m)</option><option value="cm">Centimeter (cm)</option><option value="mm">Millimeter (mm)</option><option value="mi">Mile (mi)</option><option value="yd">Yard (yd)</option><option value="ft">Foot (ft)</option><option value="in">Inch (in)</option><option value="nm">Nanometer (nm)</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="length-result">—</div></div><div class="readout-unit" id="length-unit"></div></div>
+      </div>
+
+      <!-- WEIGHT -->
+      <div class="panel" id="weight">
+        <div class="panel-head"><div class="panel-title">Weight / Mass</div><div class="panel-units">kg · g · mg · lb · oz · t · st</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="weight-val" oninput="ucConvert('weight')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="weight-from" onchange="ucConvert('weight')"><option value="kg">Kilogram (kg)</option><option value="g">Gram (g)</option><option value="mg">Milligram (mg)</option><option value="lb">Pound (lb)</option><option value="oz">Ounce (oz)</option><option value="t">Metric Ton (t)</option><option value="st">Stone (st)</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('weight')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="weight-to" onchange="ucConvert('weight')"><option value="g">Gram (g)</option><option value="kg">Kilogram (kg)</option><option value="mg">Milligram (mg)</option><option value="lb">Pound (lb)</option><option value="oz">Ounce (oz)</option><option value="t">Metric Ton (t)</option><option value="st">Stone (st)</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="weight-result">—</div></div><div class="readout-unit" id="weight-unit"></div></div>
+      </div>
+
+      <!-- TEMPERATURE -->
+      <div class="panel" id="temp">
+        <div class="panel-head"><div class="panel-title">Temperature</div><div class="panel-units">Celsius · Fahrenheit · Kelvin</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="temp-val" oninput="ucConvert('temp')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="temp-from" onchange="ucConvert('temp')"><option value="c">Celsius (C)</option><option value="f">Fahrenheit (F)</option><option value="k">Kelvin (K)</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('temp')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="temp-to" onchange="ucConvert('temp')"><option value="f">Fahrenheit (F)</option><option value="c">Celsius (C)</option><option value="k">Kelvin (K)</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="temp-result">—</div></div><div class="readout-unit" id="temp-unit"></div></div>
+      </div>
+
+      <!-- AREA -->
+      <div class="panel" id="area">
+        <div class="panel-head"><div class="panel-title">Area</div><div class="panel-units">m² · km² · ft² · in² · acre · hectare</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="area-val" oninput="ucConvert('area')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="area-from" onchange="ucConvert('area')"><option value="m2">Square Meter (m²)</option><option value="km2">Square Kilometer (km²)</option><option value="cm2">Square Centimeter (cm²)</option><option value="ft2">Square Foot (ft²)</option><option value="in2">Square Inch (in²)</option><option value="ac">Acre</option><option value="ha">Hectare</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('area')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="area-to" onchange="ucConvert('area')"><option value="km2">Square Kilometer (km²)</option><option value="m2">Square Meter (m²)</option><option value="cm2">Square Centimeter (cm²)</option><option value="ft2">Square Foot (ft²)</option><option value="in2">Square Inch (in²)</option><option value="ac">Acre</option><option value="ha">Hectare</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="area-result">—</div></div><div class="readout-unit" id="area-unit"></div></div>
+      </div>
+
+      <!-- VOLUME -->
+      <div class="panel" id="volume">
+        <div class="panel-head"><div class="panel-title">Volume</div><div class="panel-units">L · mL · gal · qt · pt · cup · fl oz</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="volume-val" oninput="ucConvert('volume')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="volume-from" onchange="ucConvert('volume')"><option value="l">Liter (L)</option><option value="ml">Milliliter (mL)</option><option value="m3">Cubic Meter (m³)</option><option value="gal">Gallon (US)</option><option value="qt">Quart (US)</option><option value="pt">Pint (US)</option><option value="cup">Cup (US)</option><option value="floz">Fl. Ounce (US)</option><option value="tbsp">Tablespoon</option><option value="tsp">Teaspoon</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('volume')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="volume-to" onchange="ucConvert('volume')"><option value="ml">Milliliter (mL)</option><option value="l">Liter (L)</option><option value="m3">Cubic Meter (m³)</option><option value="gal">Gallon (US)</option><option value="qt">Quart (US)</option><option value="pt">Pint (US)</option><option value="cup">Cup (US)</option><option value="floz">Fl. Ounce (US)</option><option value="tbsp">Tablespoon</option><option value="tsp">Teaspoon</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="volume-result">—</div></div><div class="readout-unit" id="volume-unit"></div></div>
+      </div>
+
+      <!-- SPEED -->
+      <div class="panel" id="speed">
+        <div class="panel-head"><div class="panel-title">Speed</div><div class="panel-units">km/h · m/s · mph · knot · mach</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="speed-val" oninput="ucConvert('speed')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="speed-from" onchange="ucConvert('speed')"><option value="kmh">km/h</option><option value="ms">m/s</option><option value="mph">mph</option><option value="kn">Knot</option><option value="mach">Mach</option><option value="fts">ft/s</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('speed')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="speed-to" onchange="ucConvert('speed')"><option value="mph">mph</option><option value="kmh">km/h</option><option value="ms">m/s</option><option value="kn">Knot</option><option value="mach">Mach</option><option value="fts">ft/s</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="speed-result">—</div></div><div class="readout-unit" id="speed-unit"></div></div>
+      </div>
+
+      <!-- TIME -->
+      <div class="panel" id="time">
+        <div class="panel-head"><div class="panel-title">Time</div><div class="panel-units">s · min · h · day · week · month · year</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="time-val" oninput="ucConvert('time')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="time-from" onchange="ucConvert('time')"><option value="s">Second</option><option value="ms">Millisecond</option><option value="min">Minute</option><option value="h">Hour</option><option value="d">Day</option><option value="wk">Week</option><option value="mo">Month (avg)</option><option value="yr">Year</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('time')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="time-to" onchange="ucConvert('time')"><option value="min">Minute</option><option value="ms">Millisecond</option><option value="s">Second</option><option value="h">Hour</option><option value="d">Day</option><option value="wk">Week</option><option value="mo">Month (avg)</option><option value="yr">Year</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="time-result">—</div></div><div class="readout-unit" id="time-unit"></div></div>
+      </div>
+
+      <!-- DATA -->
+      <div class="panel" id="data">
+        <div class="panel-head"><div class="panel-title">Data Storage</div><div class="panel-units">bit · byte · KB · MB · GB · TB · PB</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="data-val" oninput="ucConvert('data')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="data-from" onchange="ucConvert('data')"><option value="b">Bit</option><option value="B">Byte</option><option value="KB">Kilobyte (KB)</option><option value="MB">Megabyte (MB)</option><option value="GB">Gigabyte (GB)</option><option value="TB">Terabyte (TB)</option><option value="PB">Petabyte (PB)</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('data')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="data-to" onchange="ucConvert('data')"><option value="MB">Megabyte (MB)</option><option value="b">Bit</option><option value="B">Byte</option><option value="KB">Kilobyte (KB)</option><option value="GB">Gigabyte (GB)</option><option value="TB">Terabyte (TB)</option><option value="PB">Petabyte (PB)</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="data-result">—</div></div><div class="readout-unit" id="data-unit"></div></div>
+      </div>
+
+      <!-- ENERGY -->
+      <div class="panel" id="energy">
+        <div class="panel-head"><div class="panel-title">Energy</div><div class="panel-units">J · kJ · cal · kcal · kWh · BTU · erg</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="energy-val" oninput="ucConvert('energy')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="energy-from" onchange="ucConvert('energy')"><option value="j">Joule (J)</option><option value="kj">Kilojoule (kJ)</option><option value="cal">Calorie (cal)</option><option value="kcal">Kilocalorie (kcal)</option><option value="kwh">Kilowatt-hour (kWh)</option><option value="btu">BTU</option><option value="erg">Erg</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('energy')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="energy-to" onchange="ucConvert('energy')"><option value="kcal">Kilocalorie (kcal)</option><option value="j">Joule (J)</option><option value="kj">Kilojoule (kJ)</option><option value="cal">Calorie (cal)</option><option value="kwh">Kilowatt-hour (kWh)</option><option value="btu">BTU</option><option value="erg">Erg</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="energy-result">—</div></div><div class="readout-unit" id="energy-unit"></div></div>
+      </div>
+
+      <!-- PRESSURE -->
+      <div class="panel" id="pressure">
+        <div class="panel-head"><div class="panel-title">Pressure</div><div class="panel-units">Pa · kPa · bar · psi · atm · torr</div></div>
+        <div class="row"><div class="field"><label>Reading</label><input id="pressure-val" oninput="ucConvert('pressure')" placeholder="0" type="number" /></div>
+        <div class="field"><label>From unit</label><select id="pressure-from" onchange="ucConvert('pressure')"><option value="pa">Pascal (Pa)</option><option value="kpa">Kilopascal (kPa)</option><option value="bar">Bar</option><option value="psi">PSI</option><option value="atm">Atmosphere (atm)</option><option value="torr">Torr (mmHg)</option></select></div></div>
+        <div class="swap-row"><div class="tick"></div><button class="swap-btn" onclick="ucSwap('pressure')">⇄</button><div class="tick"></div></div>
+        <div class="row"><div class="field"><label>To unit</label><select id="pressure-to" onchange="ucConvert('pressure')"><option value="psi">PSI</option><option value="pa">Pascal (Pa)</option><option value="kpa">Kilopascal (kPa)</option><option value="bar">Bar</option><option value="atm">Atmosphere (atm)</option><option value="torr">Torr (mmHg)</option></select></div></div>
+        <div class="readout"><div><div class="readout-label">Result</div><div class="readout-value" id="pressure-result">—</div></div><div class="readout-unit" id="pressure-unit"></div></div>
+      </div>
+
+      <!-- SHARE -->
+      <div class="share">
+        <a class="share-btn" href="#" onclick="ucShareOn('fb', event)" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <a class="share-btn" href="#" onclick="ucShareOn('x', event)" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X
+        </a>
+        <a class="share-btn" href="#" onclick="ucShareOn('linkedin', event)" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="share-btn" href="#" onclick="ucShareOn('whatsapp', event)" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.238c0-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.438 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.86 11.86 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
+          WhatsApp
+        </a>
+        <a class="share-btn" href="#" onclick="ucShareOn('pinterest', event)" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.283 1.194.6 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.222-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.62 0 11.988-5.368 11.988-11.987C23.997 5.367 18.628 0 12.017 0"/></svg>
+          Pinterest
+        </a>
+        <button class="share-btn" onclick="ucCopyPageUrl()">
+          <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy link
+        </button>
+      </div>
+
+      <!-- NOTES -->
+      <div class="notes">
+        <p><b>What this is.</b> Conversion Bench covers ten measurement types — length, weight, temperature, area, volume, speed, time, data storage, energy and pressure — with more than 200 unit pairs between them. Pick a measurement from the rail, dial in a reading, and the display updates as you type.</p>
+        <p><b>How it works.</b> Every calculation runs as JavaScript in your browser tab. Nothing is sent to a server, nothing is logged, and it keeps working with no connection once the page has loaded. Results are shown to eight significant digits, and very large or very small values switch to scientific notation automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER TITLE BLOCK -->
+  <div class="footblock">
+    <div><span class="brand">UNIT CONVERTER TOOL</span> — from the house of Internet AI Tools</div>
+    <div>© 2026 · Hosted on GitHub Pages · <a href="https://InternetAiTools.com" target="_blank" rel="noopener noreferrer">InternetAiTools.com</a></div>
+  </div>
+
+  </div>
+  <!-- /MAIN -->
+</div>
+<!-- /SHELL -->
+
+<script>
+(function () {
+  // TAB SWITCHING
+  document.querySelectorAll('.rail-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.rail-btn').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function (c) { c.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  window.ucSwap = function (cat) {
+    var f = document.getElementById(cat + '-from');
+    var t = document.getElementById(cat + '-to');
+    var tmp = f.value;
+    f.value = t.value;
+    t.value = tmp;
+    ucConvert(cat);
+  };
+
+  var toBase = {
+    length: { m:1, km:1000, cm:0.01, mm:0.001, mi:1609.344, yd:0.9144, ft:0.3048, in:0.0254, nm:1e-9 },
+    weight: { kg:1, g:0.001, mg:1e-6, lb:0.453592, oz:0.0283495, t:1000, st:6.35029 },
+    area:   { m2:1, km2:1e6, cm2:1e-4, ft2:0.092903, in2:6.4516e-4, ac:4046.86, ha:10000 },
+    volume: { l:1, ml:0.001, m3:1000, gal:3.78541, qt:0.946353, pt:0.473176, cup:0.236588, floz:0.0295735, tbsp:0.0147868, tsp:0.00492892 },
+    speed:  { kmh:1, ms:3.6, mph:1.60934, kn:1.852, mach:1225.044, fts:1.09728 },
+    time:   { s:1, ms:0.001, min:60, h:3600, d:86400, wk:604800, mo:2629746, yr:31556952 },
+    data:   { b:1, B:8, KB:8192, MB:8388608, GB:8589934592, TB:8796093022208, PB:9007199254740992 },
+    energy: { j:1, kj:1000, cal:4.184, kcal:4184, kwh:3600000, btu:1055.06, erg:1e-7 },
+    pressure:{ pa:1, kpa:1000, bar:100000, psi:6894.76, atm:101325, torr:133.322 }
+  };
+  var unitLabels = {
+    length: { m:'meter',km:'kilometer',cm:'centimeter',mm:'millimeter',mi:'mile',yd:'yard',ft:'foot',in:'inch',nm:'nanometer' },
+    weight: { kg:'kilogram',g:'gram',mg:'milligram',lb:'pound',oz:'ounce',t:'metric ton',st:'stone' },
+    area:   { m2:'m²',km2:'km²',cm2:'cm²',ft2:'ft²',in2:'in²',ac:'acre',ha:'hectare' },
+    volume: { l:'liter',ml:'milliliter',m3:'m³',gal:'gallon',qt:'quart',pt:'pint',cup:'cup',floz:'fl.oz',tbsp:'tablespoon',tsp:'teaspoon' },
+    speed:  { kmh:'km/h',ms:'m/s',mph:'mph',kn:'knot',mach:'mach',fts:'ft/s' },
+    time:   { s:'second',ms:'millisecond',min:'minute',h:'hour',d:'day',wk:'week',mo:'month',yr:'year' },
+    data:   { b:'bit',B:'byte',KB:'kilobyte',MB:'megabyte',GB:'gigabyte',TB:'terabyte',PB:'petabyte' },
+    energy: { j:'joule',kj:'kilojoule',cal:'calorie',kcal:'kilocalorie',kwh:'kWh',btu:'BTU',erg:'erg' },
+    pressure:{ pa:'pascal',kpa:'kilopascal',bar:'bar',psi:'psi',atm:'atmosphere',torr:'torr' }
+  };
+
+  window.ucConvert = function (cat) {
+    var val = parseFloat(document.getElementById(cat+'-val').value);
+    var from = document.getElementById(cat+'-from').value;
+    var to   = document.getElementById(cat+'-to').value;
+    var resEl  = document.getElementById(cat+'-result');
+    var unitEl = document.getElementById(cat+'-unit');
+    if (isNaN(val)) { resEl.textContent='—'; unitEl.textContent=''; return; }
+    var result;
+    if (cat === 'temp') {
+      var celsius;
+      if (from === 'c') celsius = val;
+      else if (from === 'f') celsius = (val - 32) * 5/9;
+      else celsius = val - 273.15;
+      if (to === 'c') result = celsius;
+      else if (to === 'f') result = celsius * 9/5 + 32;
+      else result = celsius + 273.15;
+      var labels = { c:'Celsius (C)', f:'Fahrenheit (F)', k:'Kelvin (K)' };
+      unitEl.textContent = labels[to];
+    } else {
+      var base = val * toBase[cat][from];
+      result = base / toBase[cat][to];
+      unitEl.textContent = unitLabels[cat][to];
+    }
+    var absVal = Math.abs(result);
+    var formatted;
+    if (absVal === 0) formatted = '0';
+    else if (absVal >= 1e12 || absVal < 1e-9) formatted = result.toExponential(5);
+    else if (absVal >= 1) formatted = parseFloat(result.toPrecision(8)).toString();
+    else formatted = parseFloat(result.toPrecision(6)).toString();
+    resEl.textContent = formatted;
+  };
+
+  // ===== SOCIAL SHARING =====
+  window.ucShareOn = function (platform, event) {
+    event.preventDefault();
+    var url = encodeURIComponent(window.location.href);
+    var title = encodeURIComponent('Unit Converter Tool — From the House of Internet AI Tools');
+    var media = encodeURIComponent(window.location.origin + '/favicon.og-image.jpg');
+    var shareUrl = '';
+
+    switch (platform) {
+      case 'fb':
+        shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
+        break;
+      case 'x':
+        shareUrl = 'https://twitter.com/intent/tweet?url=' + url + '&text=' + title;
+        break;
+      case 'linkedin':
+        shareUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + url;
+        break;
+      case 'whatsapp':
+        shareUrl = 'https://wa.me/?text=' + title + '%20' + url;
+        break;
+      case 'pinterest':
+        shareUrl = 'https://pinterest.com/pin/create/button/?url=' + url + '&media=' + media + '&description=' + title;
+        break;
+      default:
+        return;
+    }
+
+    window.open(shareUrl, '_blank', 'width=600,height=500');
+  };
+
+  window.ucCopyPageUrl = function () {
+    var url = window.location.href;
+    function done() {
+      var btns = document.querySelectorAll('.share-btn');
+      var btn = btns[btns.length - 1];
+      var originalText = btn.innerHTML;
+      btn.textContent = 'Copied!';
+      setTimeout(function () { btn.innerHTML = originalText; }, 2000);
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(done).catch(function () { ucFallbackCopy(url, done); });
+    } else {
+      ucFallbackCopy(url, done);
+    }
+  };
+
+  function ucFallbackCopy(text, cb) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      if (cb) cb();
+    } catch (e) {}
+    document.body.removeChild(textarea);
+  }
+})();
+</script>
+</body>
+</html>
